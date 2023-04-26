@@ -55,3 +55,6 @@ class Game:
   
   def switch_turn(self):
     self.next_turn = 'black' if self.next_turn == 'white' else 'white'
+
+  def reset(self):
+    self.__init__()
