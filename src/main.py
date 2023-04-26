@@ -35,10 +35,12 @@ class Main:
 
           if board.squares[clicked_row][clicked_col].has_piece():
             piece = board.squares[clicked_row][clicked_col].piece
-            board.calc_moves(piece, clicked_row, clicked_col)
-            dragger.save_initial(event.pos)
-            dragger.drag_piece(piece)
-            game.show_moves(screen)
+
+            if piece.color == game.next_turn:
+              board.calc_moves(piece, clicked_row, clicked_col)
+              dragger.save_initial(event.pos)
+              dragger.drag_piece(piece)
+              game.show_moves(screen)
 
         elif event.type == pygame.MOUSEMOTION:
           if dragger.dragging:
@@ -56,6 +58,7 @@ class Main:
 
             if board.valid_move(dragger.piece, move):
               board.move(dragger.piece, move)
+              game.switch_turn()
 
           dragger.undrag_piece()
         
