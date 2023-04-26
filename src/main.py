@@ -21,6 +21,7 @@ class Main:
 
     while True:
       game.show_bg(screen)
+      game.show_last_move(screen)
       game.show_moves(screen)
       game.show_pieces(screen)
 
@@ -58,6 +59,7 @@ class Main:
 
             if board.valid_move(dragger.piece, move):
               board.move(dragger.piece, move)
+              game.show_last_move(screen)
               game.switch_turn()
 
           dragger.undrag_piece()
