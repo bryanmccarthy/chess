@@ -16,16 +16,27 @@ class Board:
     final = move.final
     self.squares[initial.row][initial.col].piece = None
     self.squares[final.row][final.col].piece = piece
+
+    if isinstance(piece, Pawn):
+      self.check_promotion(piece, final)
+
     piece.moved = True
     piece.clear_moves()
     self.last_move = move
 
   def valid_move(self, piece, move):
     return move in piece.moves
+  
+  def check_promotion(self, piece, final):
+    if final.row == 0 or final.row == 7:
+      self.squares[final.row][final.col].piece = Queen(piece.color)
+
+  def castle(self, initial, final):
+    pass
 
   def calc_moves(self, piece, row, col):
     def pawn_moves():
-      # TODO: En passant and promotion
+      # TODO: En passant
       steps = 1 if piece.moved else 2
       
       # Vertical (move)
