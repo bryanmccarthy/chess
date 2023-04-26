@@ -20,6 +20,17 @@ class Board:
     if isinstance(piece, Pawn):
       self.check_promotion(piece, final)
 
+    if isinstance(piece, King):
+      if self.castle(initial, final):
+        diff = final.col - initial.col
+
+        if diff < 0:
+          rook = piece.left_rook
+        else:
+          rook = piece.right_rook
+        
+        self.move(rook, rook.moves[-1])
+
     piece.moved = True
     piece.clear_moves()
     self.last_move = move
@@ -32,7 +43,7 @@ class Board:
       self.squares[final.row][final.col].piece = Queen(piece.color)
 
   def castle(self, initial, final):
-    pass
+    return abs(initial.col - final.col) == 2
 
   def calc_moves(self, piece, row, col):
     def pawn_moves():
@@ -113,7 +124,8 @@ class Board:
           possible_move_row, possible_move_col = possible_move_row + row_incr, possible_move_col + col_incr
 
     def king_moves():
-      # TODO: Castling
+      # TODO: Prevent king from moving into check
+      # TODO: Prevent King from castling if in check or if any square between king and rook is under attack
       adjacent_squares = [(row - 1, col - 1), (row - 1, col), (row - 1, col + 1), (row, col - 1), (row, col + 1), (row + 1, col - 1), (row + 1, col), (row + 1, col + 1)]
 
       for possible_move in adjacent_squares:
@@ -123,6 +135,42 @@ class Board:
           if self.squares[possible_move_row][possible_move_col].is_empty_or_enemy(piece.color):
             initial = Square(row, col)
             final = Square(possible_move_row, possible_move_col)
+            move = Move(initial, final)
+            piece.add_move(move)
+      
+      if not piece.moved:
+        left_rook = self.squares[row][0].piece
+        right_rook = self.squares[row][7].piece
+
+        if isinstance(left_rook, Rook) and not left_rook.moved:
+          if self.squares[row][1].is_empty() and self.squares[row][2].is_empty() and self.squares[row][3].is_empty():
+            piece.left_rook = left_rook
+
+            # Rook move
+            initial = Square(row, 0)
+            final = Square(row, 3)
+            move = Move(initial, final)
+            left_rook.add_move(move)
+
+            # King move
+            initial = Square(row, col)
+            final = Square(row, 2)
+            move = Move(initial, final)
+            piece.add_move(move)
+
+        if isinstance(right_rook, Rook) and not right_rook.moved:
+          if self.squares[row][5].is_empty() and self.squares[row][6].is_empty():
+            piece.right_rook = right_rook
+
+            # Rook move
+            initial = Square(row, 7)
+            final = Square(row, 5)
+            move = Move(initial, final)
+            right_rook.add_move(move)
+
+            # King move
+            initial = Square(row, col)
+            final = Square(row, 6)
             move = Move(initial, final)
             piece.add_move(move)
 
